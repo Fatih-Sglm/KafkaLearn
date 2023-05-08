@@ -4,7 +4,7 @@ using System.Text.Json;
 
 var config = new ProducerConfig
 {
-    BootstrapServers = "localhost:9092",
+    BootstrapServers = "localhost:29092",
 };
 
 using var procuder = new ProducerBuilder<Null, string>(config).Build();
