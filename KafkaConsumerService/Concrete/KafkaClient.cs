@@ -22,7 +22,7 @@ namespace KafkaConsumerService.Concrete
             return JsonSerializer.Deserialize<T>(consumer.Consume(cancellationToken).Message.Value);
         }
 
-        public async Task Subscribe(string queueName, CancellationToken cancellationToken = default)
+        public void Subscribe(string queueName)
         {
             consumer.Subscribe(queueName);
         }
