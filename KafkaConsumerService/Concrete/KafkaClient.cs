@@ -1,24 +1,20 @@
 ﻿using Confluent.Kafka;
-using KafkaConsumerService.Abstraction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace KafkaConsumerService.Concrete
 {
-    public class KafkaClient : IKafkaClient
+    public class KafkaClient
     {
         private readonly ConsumerConfig _cosumerConfig;
         private readonly IConsumer<Null, string> consumer;
 
-        public KafkaClient(ConsumerConfig cosumerConfig)
+        public KafkaClient(ConsumerConfig cosumerConfig , IConfiguration configuration)
         {
             _cosumerConfig = cosumerConfig;
             consumer = new ConsumerBuilder<Null, string>(_cosumerConfig).Build();
+            var topics = configuration.GetSection("KafkaCongif:Topics").Get<List<string>>();
+            if (topics != null)
+                consumer.Subscribe(topics);
         }
 
         public T Consume<T>(CancellationToken cancellationToken = default)

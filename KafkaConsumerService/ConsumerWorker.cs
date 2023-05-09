@@ -1,39 +1,37 @@
-﻿using KafkaConsumerService.Abstraction;
-using KafkaConsumerService.Concrete;
+﻿using KafkaConsumerService.Concrete;
 using KafkaConsumerService.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KafkaConsumerService
 {
     public class ConsumerWorker : BackgroundService
     {
         private readonly ILogger<ConsumerWorker> _logger;
-        private readonly IKafkaClient _kafkaClient;
-        public ConsumerWorker(ILogger<ConsumerWorker> logger, IKafkaClient kafkaClient)
+        private readonly KafkaClient _kafkaClient;
+        public ConsumerWorker(ILogger<ConsumerWorker> logger, KafkaClient kafkaClient)
         {
             _logger = logger;
             _kafkaClient = kafkaClient;
         }
 
+        // If you are going to run this code in a background service in an api,
+        // you need to run it in a separate thread since the consume method blocks the request.
+
+        //Eğer bu kodu bir api içindeki background erviste çalışacaksan consume metodu
+        //istemi blokladığından ayrı bir thread de çalıştırmak gerekiyor
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Console.Out.WriteLineAsync("App run");
-            await Console.Out.WriteLineAsync("App run 1");
-            await _kafkaClient.Subscribe("Deneme", stoppingToken);
+            await Task.Run(async () => { await ConsumeMessages(stoppingToken);} , stoppingToken);
+        }
+
+        private async Task ConsumeMessages(CancellationToken stoppingToken)
+        {
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                _ = Task.Run(async () =>
-                {
-                    var data = _kafkaClient.Consume<Message>();
-                    await Console.Out.WriteLineAsync("App run 2");
-                    await Console.Out.WriteLineAsync(data.Value);
-                    //Console.Out.WriteLineAsync($"{data.Id}  {data.Value}");
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                }, stoppingToken);
+                await _kafkaClient.Subscribe("Deneme", stoppingToken);
+                var data = _kafkaClient.Consume<Message>(stoppingToken);
+                Console.Out.WriteLine($"{data.Id}  {data.Value}");
+                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             }
         }
     }

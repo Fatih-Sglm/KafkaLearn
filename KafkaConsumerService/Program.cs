@@ -1,12 +1,10 @@
 using KafkaConsumerService;
-using KafkaConsumerService.Abstraction;
 using KafkaConsumerService.Concrete;
 using KafkaConsumerService.Extensions;
-using Microsoft.Extensions.Hosting;
 
 internal class Program
 {
-   // private static readonly string  env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+    // private static readonly string  env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
     public static IConfiguration Configuration = new ConfigurationBuilder()
                                  .SetBasePath(Directory.GetCurrentDirectory())
                                  .AddJsonFile("appsettings.json", optional: false)
@@ -29,7 +27,7 @@ internal class Program
     {
         services.AddKafka(Configuration);
         services.AddHostedService<ConsumerWorker>();
-        services.AddSingleton<IKafkaClient, KafkaClient>();
+        services.AddSingleton<KafkaClient>();
         return services;
     }
 }
