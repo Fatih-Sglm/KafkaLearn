@@ -12,12 +12,7 @@ namespace KafkaConsumerService
             _logger = logger;
             _kafkaClient = kafkaClient;
         }
-
-        // If you are going to run this code in a background service in an api,
-        // you need to run it in a separate thread since the consume method blocks the request.
-
-        //Eğer bu kodu bir api içindeki background erviste çalışacaksan consume metodu
-        //istemi blokladığından ayrı bir thread de çalıştırmak gerekiyor
+        
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await Task.Run(async () => { await ConsumeMessages(stoppingToken);} , stoppingToken);
